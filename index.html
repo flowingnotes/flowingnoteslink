@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>FlowingNotes</title>
+		<meta name="description" content="FlowingNotes" />
+		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M9 23c5.5 0 5.5-7 11-7' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='22' cy='11' r='2.6' fill='white'/%3E%3C/svg%3E" sizes="32x32">
+		<style>
+			:root,
+			[data-theme="light"] {
+				--bg: #f5f6f8;
+				--surface: #ffffff;
+				--surface-2: #f0f1f4;
+				--surface-3: #e9ebef;
+				--border: #e3e5ea;
+				--border-strong: #d3d6dd;
+				--text: #171a21;
+				--text-muted: #5c6470;
+				--text-faint: #9aa1ac;
+				--accent: #4f46e5;
+				--accent-hover: #4338ca;
+				--danger: #d92d20;
+				--danger-soft: #fef1f0;
+				--shadow-sm: 0 1px 2px rgba(16, 24, 40, .06);
+				--shadow-lg: 0 12px 32px rgba(16, 24, 40, .14);
+				--transition: 160ms cubic-bezier(.16, 1, .3, 1);
+			}
+			[data-theme="dark"] {
+				--bg: #0f1115;
+				--surface: #171a20;
+				--surface-2: #1d212a;
+				--surface-3: #232833;
+				--border: #2a2f39;
+				--border-strong: #3a4150;
+				--text: #e7e9ee;
+				--text-muted: #a3aab5;
+				--text-faint: #6b7280;
+				--accent: #6366f1;
+				--accent-hover: #818cf8;
+				--danger: #f97066;
+				--danger-soft: #2a1a19;
+				--shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+				--shadow-lg: 0 12px 32px rgba(0, 0, 0, .5);
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+			}
+			body {
+				display: flex;
+				flex-direction: column;
+				background: var(--bg);
+				color: var(--text);
+				font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+				-webkit-font-smoothing: antialiased;
+			}
+			button {
+				font: inherit;
+				color: inherit;
+				background: none;
+				border: 0;
+				cursor: pointer;
+			}
+			.topbar {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				height: 60px;
+				flex: none;
+				padding: 0 24px;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+			}
+			.brand {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 17px;
+				font-weight: 700;
+				letter-spacing: -.01em;
+				color: var(--text);
+			}
+			.page-title {
+				flex: 1;
+				font-size: 16px;
+				font-weight: 600;
+				letter-spacing: -.01em;
+				color: var(--text-muted);
+			}
+			.icon-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 36px;
+				height: 36px;
+				border-radius: 8px;
+				color: var(--text-muted);
+				transition: background var(--transition), color var(--transition);
+			}
+			.icon-btn:hover {
+				background: var(--surface-2);
+				color: var(--text);
+			}
+			main {
+				flex: 1;
+				display: flex;
+				justify-content: center;
+				padding: 28px 24px;
+				overflow-y: auto;
+			}
+			.wrap {
+				width: 100%;
+				max-width: 640px;
+			}
+			.page-head {
+				margin-bottom: 20px;
+			}
+			.page-head h2 {
+				margin: 0 0 6px;
+				font-size: 22px;
+				font-weight: 700;
+				letter-spacing: -.02em;
+			}
+			.page-head p {
+				margin: 0;
+				color: var(--text-muted);
+				font-size: 14px;
+			}
+			.card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+			}
+			.link-item {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				width: 100%;
+				padding: 14px 18px;
+				text-align: left;
+				border-bottom: 1px solid var(--border);
+				transition: background var(--transition);
+			}
+			.link-item:last-child {
+				border-bottom: 0;
+			}
+			.link-item:hover {
+				background: color-mix(in srgb, var(--accent) 6%, transparent);
+			}
+			.link-icon {
+				width: 38px;
+				height: 38px;
+				flex: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 10px;
+				background: color-mix(in srgb, var(--accent) 11%, transparent);
+				color: var(--accent);
+			}
+			.link-name {
+				flex: 1;
+				min-width: 0;
+				font-size: 15px;
+				font-weight: 600;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.link-arrow {
+				flex: none;
+				color: var(--text-faint);
+				display: inline-flex;
+			}
+			.empty {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				padding: 48px 24px;
+				text-align: center;
+				color: var(--text-muted);
+			}
+			.empty-icon {
+				width: 44px;
+				height: 44px;
+				border-radius: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--surface-2);
+				color: var(--text-faint);
+				margin-bottom: 4px;
+			}
+			.empty-title {
+				font-size: 15px;
+				font-weight: 600;
+				color: var(--text);
+			}
+			.empty-text {
+				font-size: 13px;
+				max-width: 380px;
+			}
+
+			/* ---------- full-page iframe overlay ---------- */
+			#overlay {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				display: none;
+				flex-direction: column;
+				background: var(--surface);
+			}
+			#overlay.open {
+				display: flex;
+			}
+			#overlayBar {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				height: 52px;
+				flex: none;
+				padding: 0 16px;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+			}
+			#overlayName {
+				flex: 1;
+				min-width: 0;
+				font-size: 15px;
+				font-weight: 600;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			#overlayFrame {
+				flex: 1;
+				min-height: 0;
+				width: 100%;
+				border: 0;
+				background: var(--surface);
+			}
+			#overlayLoading {
+				position: absolute;
+				inset: 52px 0 0 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--text-faint);
+				font-size: 14px;
+				pointer-events: none;
+				transition: opacity var(--transition);
+			}
+			#overlayLoading.hide {
+				opacity: 0;
+			}
+			@media (max-width: 640px) {
+				.topbar {
+					padding: 0 16px;
+				}
+				main {
+					padding: 16px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="topbar">
+			<div class="brand">
+				<svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 23c5.5 0 5.5-7 11-7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="22" cy="11" r="2.6" fill="#fff"/></svg>
+				FlowingNotes
+			</div>
+			<div class="page-title">Links</div>
+			<button id="theme" class="icon-btn" type="button" title="Toggle theme" aria-label="Toggle theme">
+				<svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+			</button>
+		</header>
+
+		<main>
+			<div class="wrap">
+				<div class="page-head">
+					<h2>Links</h2>
+					<p>Choose a link below to open it.</p>
+				</div>
+				<div class="card" id="list"></div>
+			</div>
+		</main>
+
+		<div id="overlay" role="dialog" aria-modal="true" aria-label="Embedded page">
+			<div id="overlayBar">
+				<button id="overlayClose" class="icon-btn" type="button" title="Close" aria-label="Close">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+				</button>
+				<div id="overlayName"></div>
+				<button id="overlayReload" class="icon-btn" type="button" title="Reload" aria-label="Reload">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.5 15a9 9 0 1 1-2-9.4L23 10"/></svg>
+				</button>
+				<button id="overlayOpen" class="icon-btn" type="button" title="Open in new tab" aria-label="Open in new tab">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+				</button>
+			</div>
+			<div id="overlayLoading">Loading…</div>
+			<iframe id="overlayFrame" title="Embedded page"></iframe>
+		</div>
+
+		<script>
+			"use strict";
+			(function () {
+				var FETCH_URL =
+					"https://raw.githubusercontent.com/flowingnotes/flowingnotesfetch/refs/heads/main/noteslink.txt";
+
+				var els = {
+					list: document.getElementById("list"),
+					overlay: document.getElementById("overlay"),
+					overlayName: document.getElementById("overlayName"),
+					overlayFrame: document.getElementById("overlayFrame"),
+					overlayLoading: document.getElementById("overlayLoading"),
+				};
+
+				/* Short display name: the host part between "//" and the first "." */
+				function displayName(url) {
+					var s = String(url).trim();
+					var host = s;
+					var scheme = s.match(/^[a-z][a-z0-9+.-]*:\/\//i);
+					if (scheme) host = s.slice(scheme[0].length);
+					host = host.split(/[/?#]/)[0];
+					var dot = host.indexOf(".");
+					return dot === -1 ? host : host.slice(0, dot);
+				}
+
+				function renderList(urls) {
+					if (!urls.length) {
+						els.list.innerHTML =
+							'<div class="empty"><div class="empty-icon">' +
+							'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+							"</div><div class=\"empty-title\">No links available</div><div class=\"empty-text\">The link list is empty right now.</div></div>";
+						return;
+					}
+					els.list.innerHTML = urls
+						.map(function (url, i) {
+							var name = displayName(url);
+							return (
+								'<button class="link-item" type="button" data-i="' + i + '">' +
+								'<span class="link-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>' +
+								'<span class="link-name"></span>' +
+								'<span class="link-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span>' +
+								"</button>"
+							);
+						})
+						.join("");
+					var rows = els.list.querySelectorAll(".link-item");
+					urls.forEach(function (url, i) {
+						rows[i].querySelector(".link-name").textContent = displayName(url);
+						rows[i].addEventListener("click", function () {
+							openOverlay(url);
+						});
+					});
+				}
+
+				function renderError(message) {
+					els.list.innerHTML =
+						'<div class="empty"><div class="empty-icon">' +
+						'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+						"</div><div class=\"empty-title\">Couldn't load links</div><div class=\"empty-text\"></div></div>";
+					els.list.querySelector(".empty-text").textContent = message;
+				}
+
+				function loadLinks() {
+					els.list.innerHTML =
+						'<div class="empty"><div class="empty-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="empty-title">Loading links</div><div class="empty-text">One moment…</div></div>';
+					fetch(FETCH_URL)
+						.then(function (res) {
+							if (!res.ok) throw new Error("HTTP " + res.status);
+							return res.text();
+						})
+						.then(function (text) {
+							var urls = text
+								.split(/\r?\n/)
+								.map(function (line) {
+									return line.trim();
+								})
+								.filter(function (line) {
+									return line && /^[a-z][a-z0-9+.-]*:\/\//i.test(line);
+								});
+							renderList(urls);
+						})
+						.catch(function () {
+							renderError("The link list could not be loaded. Check your connection and try again.");
+						});
+				}
+
+				/* ---------- overlay ---------- */
+
+				var currentUrl = null;
+
+				function openOverlay(url) {
+					currentUrl = url;
+					els.overlayName.textContent = displayName(url);
+					els.overlayLoading.classList.remove("hide");
+					els.overlayFrame.src = url;
+					els.overlay.classList.add("open");
+				}
+
+				function closeOverlay() {
+					els.overlay.classList.remove("open");
+					els.overlayFrame.src = "about:blank";
+					currentUrl = null;
+				}
+
+				document.getElementById("overlayClose").addEventListener("click", closeOverlay);
+				document.getElementById("overlayReload").addEventListener("click", function () {
+					if (currentUrl) {
+						els.overlayLoading.classList.remove("hide");
+						els.overlayFrame.src = currentUrl;
+					}
+				});
+				document.getElementById("overlayOpen").addEventListener("click", function () {
+					if (currentUrl) window.open(currentUrl, "_blank", "noopener");
+				});
+				els.overlayFrame.addEventListener("load", function () {
+					els.overlayLoading.classList.add("hide");
+				});
+				document.addEventListener("keydown", function (e) {
+					if (e.key === "Escape" && els.overlay.classList.contains("open")) closeOverlay();
+				});
+
+				/* ---------- theme ---------- */
+
+				var THEME_KEY = "fn.theme";
+				var saved = null;
+				try {
+					saved = JSON.parse(localStorage.getItem("fn.settings") || "null");
+				} catch (e) {}
+				var theme = saved && saved.theme ? saved.theme : localStorage.getItem(THEME_KEY) || "light";
+				var themeIcon = document.getElementById("theme-icon");
+				function applyTheme(t) {
+					document.documentElement.setAttribute("data-theme", t);
+					themeIcon.innerHTML =
+						t === "dark"
+							? '<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>'
+							: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+					localStorage.setItem(THEME_KEY, t);
+				}
+				applyTheme(theme);
+				document.getElementById("theme").addEventListener("click", function () {
+					applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+				});
+
+				loadLinks();
+			})();
+		</script>
+	</body>
+</html>
